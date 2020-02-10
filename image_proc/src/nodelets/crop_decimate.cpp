@@ -333,8 +333,8 @@ void CropDecimateNodelet::imageCb(const sensor_msgs::ImageConstPtr& image_msg,
 
   // Create updated CameraInfo message
   sensor_msgs::CameraInfoPtr out_info = boost::make_shared<sensor_msgs::CameraInfo>(*info_msg);
-  const auto decimation_factor_x = 1/config.decimation_x;
-  const auto decimation_factor_y = 1/config.decimation_y;
+  const auto decimation_factor_x = 1.0/config.decimation_x;
+  const auto decimation_factor_y = 1.0/config.decimation_y;
   out_info->width *= decimation_factor_x;
   out_info->height *= decimation_factor_y;
   out_info->K[0] *= decimation_factor_x;
