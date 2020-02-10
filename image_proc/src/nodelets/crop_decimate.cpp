@@ -333,17 +333,14 @@ void CropDecimateNodelet::imageCb(const sensor_msgs::ImageConstPtr& image_msg,
 
   // Create updated CameraInfo message
   sensor_msgs::CameraInfoPtr out_info = boost::make_shared<sensor_msgs::CameraInfo>(*info_msg);
-  int binning_x = std::max((int)info_msg->binning_x, 1);
-  int binning_y = std::max((int)info_msg->binning_y, 1);
-  out_info->binning_x = binning_x * config.decimation_x;
-  out_info->binning_y = binning_y * config.decimation_y;
-  out_info->roi.x_offset += config.x_offset * binning_x;
-  out_info->roi.y_offset += config.y_offset * binning_y;
-  out_info->roi.height = height * binning_y;
-  out_info->roi.width = width * binning_x;
-  // If no ROI specified, leave do_rectify as-is. If ROI specified, set do_rectify = true.
-  if (width != (int)image_msg->width || height != (int)image_msg->height)
-    out_info->roi.do_rectify = true;
+  const auto decimation_factor_x = 1/config.decimation_x;
+  const auto decimation_factor_y = 1/config.decimation_y;
+  out_info->width *= decimation_factor_x;
+  out_info->height *= decimation_factor_y;
+  out_info->K[0] *= decimation_factor_x;
+  out_info->K[2] *= decimation_factor_x;
+  out_info->K[4] *= decimation_factor_y;
+  out_info->K[5] *= decimation_factor_y;
 
   if (!target_frame_id_.empty()) {
     out_image->header.frame_id = target_frame_id_;
